@@ -46,6 +46,7 @@ class Experiment:
 
 EXPERIMENTS = {
     "w960_nonoverlap": Experiment(name="w960_nonoverlap", proxy_width=960),
+    "w960_average": Experiment(name="w960_average", proxy_width=960, batch_size=4, eval_mode="average"),
     "w1280_nonoverlap": Experiment(name="w1280_nonoverlap", proxy_width=1280),
     "w1280_inpaint": Experiment(name="w1280_inpaint", proxy_width=1280, use_inpaint=True),
 }
