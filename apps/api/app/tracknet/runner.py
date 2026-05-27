@@ -138,6 +138,11 @@ def run_tracknetv3(
         "source_width": width,
         "source_height": height,
         "method": "tracknetv3",
+        "post_filter": {
+            "name": "court_airspace_loose",
+            "court_bounds_m": [-3.5, COURT_WIDTH_M + 3.5, -6.5, COURT_LENGTH_M + 6.5],
+            "max_single_frame_jump_px": 520,
+        },
         "proxy_scaler": {"x": scaler[0], "y": scaler[1]},
         "detected_frames": len(detected),
         "frames": frames,
@@ -265,11 +270,11 @@ def reject_reason(
     if court_point and last_kept.get("court_point"):
         court_distance = distance(court_point, last_kept["court_point"])
 
-    # After a short dropout, allow reacquisition. Before that, do not let a
-    # distant point on another court hijack the current rally trajectory.
-    if rejected_streak < int(source_fps * 0.35) and predicted_distance > max(160, 2600 * dt):
+    # After a short dropout, allow reacquisition. Before that, reject jumps that
+    # are too large for the current court while still allowing fast smashes.
+    if rejected_streak < int(source_fps * 0.35) and predicted_distance > max(360, 5200 * dt):
         return "trajectory_jump"
-    if dt <= 0.12 and px_distance > 360:
+    if dt <= 0.12 and px_distance > 520:
         return "pixel_jump"
     if court_distance is not None and dt <= 0.12 and court_distance > 4.2:
         return "court_jump"
